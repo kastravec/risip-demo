@@ -26,40 +26,64 @@ import Risip 1.0
 ApplicationWindow {
     id: root
 
-    //starting and stopping the SIP endpoint when this component
-    //is created and destroyed respectively
+    property RisipCall activeCall
+
     Component.onCompleted: { Risip.sipEndpoint.start(); }
     Component.onDestruction: { Risip.sipEndpoint.stop(); }
 
     RisipAccountConfiguration {
         id: sipAccountDetails
         userName: "peti"
-        password: "masakerFareA1"
+        password: "masakerA1"
         serverAddress: "148.251.48.171"
+        scheme: "digest"
     }
 
-    RisipAccount {
-        id: sipAccount
-        configuration: sipAccountDetails
-        sipEndPoint: Risip.sipEndpoint
-
-        onStatusChanged: {
-            if(sipAccount.status === RisipAccount.SignedIn)
-                console.log("Account " + sipAccountDetails.uri + " is signed in!");
-        }
-    }
-
+    // handling Signal and Property changes for the main SIP Endpoint - Engine
     Connections {
         target: Risip.sipEndpoint
         onStatusChanged: {
-                if(Risip.sipEndpoint.status === RisipEndpoint.Started) {
-                    console.log("Risip Engine started!");
-                    //creating the account and setting as the default
-                    Risip.createAccount(sipAccountDetails);
-//                    Risip.setDefaultAccount(sipAccountDetails.uri);
-                    //account login
-                    sipAccount.login();
-                }
+            if(Risip.sipEndpoint.status === RisipEndpoint.Started) {
+                console.log("Risip Engine started!");
+
+                //creating the account and setting as the default
+                Risip.createAccount(sipAccountDetails);
+                Risip.setDefaultAccount(sipAccountDetails.uri);
+
+                //default account login
+                Risip.defaultAccount.login();
             }
+        }
+    }
+
+    // handling Signal and Property changes for the main and default SIP account
+    Connections {
+        target: Risip.defaultAccount
+
+        onStatusChanged: {
+            console.log("Default Account status = " + status);
+            console.log("Default Account any error ? = " + Risip.defaultAccount);
+
+            if(Risip.defaultAccount.status === RisipAccount.SignedIn) {
+                RisipCallManager.callSIPContact("kot@138.68.67.146")
+            }
+        }
+    }
+
+    // handling Signal and Property changes for the Risip Call Manager
+    // handling incoming and outgoing calls
+
+    Connections {
+        target: RisipCallManager
+
+        onIncomingCall: {
+            root.activeCall = call;
+            console.log("Incoming call from: " + root.activeCall.buddy.contact);
+        }
+
+        onOutgoingCall: {
+            root.activeCall = call;
+            console.log("Outgoing call to: " + root.activeCall.buddy.contact);
+        }
     }
 }
