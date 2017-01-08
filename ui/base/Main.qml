@@ -25,21 +25,32 @@ import Risip 1.0
 
 ApplicationWindow {
     id: root
+    visibility: Window.AutomaticVisibility
+    visible: true
+    width: 600
+    height: 400
 
-    property RisipCall activeCall
+    // ====== PART 1 Start / Stop the SIP Endpoint when needed ====.
+    // Recommended upong application startup and shutdown.
 
     Component.onCompleted: { Risip.sipEndpoint.start(); }
     Component.onDestruction: { Risip.sipEndpoint.stop(); }
 
+
+    // ===== PART 2 Create SIP Account Configurations ======
+    // Use any SIP server
+
     RisipAccountConfiguration {
         id: sipAccountDetails
-        userName: "peti"
-        password: "masakerA1"
-        serverAddress: "148.251.48.171"
+        userName: "toptop"
+        password: "toptop"
+        serverAddress: "sip2sip.info"
+        proxyServer: "proxy.sipthor.net"
         scheme: "digest"
     }
 
-    // handling Signal and Property changes for the main SIP Endpoint - Engine
+    // PART 3 Handling Signal and Property changes for endpoint and SIP UA.
+
     Connections {
         target: Risip.sipEndpoint
         onStatusChanged: {
@@ -56,34 +67,52 @@ ApplicationWindow {
         }
     }
 
+    RisipCall {
+        id: myCall
+        account: Risip.defaultAccount
+        onStatusChanged: { console.log("Call status: " + status); }
+    }
+
     // handling Signal and Property changes for the main and default SIP account
     Connections {
         target: Risip.defaultAccount
 
         onStatusChanged: {
             console.log("Default Account status = " + status);
-            console.log("Default Account any error ? = " + Risip.defaultAccount);
+            console.log("Default Account any error ? = " + Risip.defaultAccount.errorInfo);
 
             if(Risip.defaultAccount.status === RisipAccount.SignedIn) {
-                RisipCallManager.callSIPContact("kot@138.68.67.146")
+
+                //Create a conference room with SylkServer
+                myCall.callExternalSIP("sip:kotfare@138.68.67.146");
             }
         }
     }
 
-    // handling Signal and Property changes for the Risip Call Manager
-    // handling incoming and outgoing calls
 
-    Connections {
-        target: RisipCallManager
+    // A Simple and Minimalistic UI
+    Rectangle {
+        id: mainview
+        anchors.fill: parent
 
-        onIncomingCall: {
-            root.activeCall = call;
-            console.log("Incoming call from: " + root.activeCall.buddy.contact);
-        }
+        Column {
+            anchors.centerIn: mainview
+            spacing: 20
+            Row {
+                Label {text: qsTr("Account status : ")}
+                Label {
+                    id: accountStatus
+                    text: Risip.defaultAccount.statusText
+                }
+            }
 
-        onOutgoingCall: {
-            root.activeCall = call;
-            console.log("Outgoing call to: " + root.activeCall.buddy.contact);
+            Row {
+                Label {text: qsTr("Call status : ")}
+                Label {
+                    id: callStatus
+                    text: myCall.status
+                }
+            }
         }
     }
 }

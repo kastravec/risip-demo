@@ -36,9 +36,9 @@ int main(int argc, char *argv[])
     Risip::registerToQml();
 
     //the ui loader resolves which ui to be loaded for the platform/operating sytem
-    RisipUiLoader *ui = new RisipUiLoader(Risip::instance());
-    ui->setQmlFile("qrc:/ui/base/Main.qml");
-    ui->start();
+    RisipUiLoader ui;
+    ui.setQmlFile("qrc:/ui/base/Main.qml");
+    ui.start();
 
     return app.exec();
 }
