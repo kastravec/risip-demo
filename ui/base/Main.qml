@@ -55,7 +55,6 @@ ApplicationWindow {
         target: Risip.sipEndpoint
         onStatusChanged: {
             if(Risip.sipEndpoint.status === RisipEndpoint.Started) {
-                console.log("Risip Engine started!");
 
                 //creating the account and setting as the default
                 Risip.createAccount(sipAccountDetails);
@@ -70,7 +69,6 @@ ApplicationWindow {
     RisipCall {
         id: myCall
         account: Risip.defaultAccount
-        onStatusChanged: { console.log("Call status: " + status); }
     }
 
     // handling Signal and Property changes for the main and default SIP account
