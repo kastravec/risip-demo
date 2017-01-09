@@ -18,7 +18,7 @@
 #
 ###################################################################################
 
-include(risip-voipsdk/risipsdk.pri)
+include(risip-voipsdk/src/risip-voipsdk.pri)
 
 TEMPLATE = app
 TARGET = risip-demo
