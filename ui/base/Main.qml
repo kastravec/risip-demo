@@ -69,6 +69,12 @@ ApplicationWindow {
     RisipCall {
         id: myCall
         account: Risip.defaultAccount
+
+        buddy: RisipBuddy {
+            id: mycallBuddy
+            contact: "topatop"
+            account: Risip.defaultAccount
+        }
     }
 
     // handling Signal and Property changes for the main and default SIP account
@@ -80,9 +86,7 @@ ApplicationWindow {
             console.log("Default Account any error ? = " + Risip.defaultAccount.errorInfo);
 
             if(Risip.defaultAccount.status === RisipAccount.SignedIn) {
-
-                //Create a conference room with SylkServer
-                myCall.callExternalSIP("sip:kotfare@138.68.67.146");
+                myCall.call();
             }
         }
     }
