@@ -57,7 +57,7 @@ ApplicationWindow {
             if(Risip.sipEndpoint.status === RisipEndpoint.Started) {
 
                 //creating the account and setting as the default
-                Risip.createAccount(sipAccountDetails);
+                Risip.accountForConfiguration(sipAccountDetails);
                 Risip.setDefaultAccount(sipAccountDetails.uri);
 
                 //default account login
